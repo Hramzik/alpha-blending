@@ -22,15 +22,33 @@
 
 
 Return_code merge_pictures              (Picture32* result, Picture32* top, Picture24* bottom, Point offset);
-Return_code copy_pixels_until_equal_top (Picture32* result, Picture24* bottom, Point offset);
-Return_code merge_pixels_from_equal_top (Picture32* result, Picture32* top, Picture24* bottom, Point offset);
 
-Return_code copy_line  (Picture32* result, Picture24* bottom);
+Return_code copy_top_upper (Picture32* result, int* line, Picture32* top, Point offset);
+Return_code fill_void_upper (Picture32* result, int* line);
+Return_code copy_bottom_upper (Picture32* result, int* line, Picture32* top, Picture24* bottom, Point offset);
+Return_code merge_top_with_bottom (Picture32* result, int* line, Picture32* top, Picture24* bottom, Point offset);
+Return_code copy_bottom_lower (Picture32* result, int* line, Picture24* bottom, Point offset);
+Return_code fill_void_lower (Picture32* result, int* line, Point offset);
+Return_code copy_top_lower (Picture32* result, int* line, Picture32* top, Point offset);
+
+Return_code copy_top_line (Picture32* result, Picture32* top, Point offset);
+Return_code copy_bottom_line (Picture32* result, Picture24* bottom, Point offset);
+Return_code load_line_default (Picture32* result);
 Return_code merge_line (Picture32* result, Picture32* top, Picture24* bottom, Point offset);
 
+
 Return_code load_pixel32_from_pixel24 (Pixel_color32* dst, Pixel_color24* src);
+Return_code write_picture24_to_picture32 (Picture32* dst, Picture24* src, int* column, int max_column);
+
+Return_code load_pixel32_from_pixel32 (Pixel_color32* dst, Pixel_color32* src);
+Return_code write_picture32_to_picture32 (Picture32* dst, Picture32* src, int* column, int max_column);
+
 Return_code load_pixel32_default      (Pixel_color32* dst);
-Return_code merge_pixels              (Pixel_color32* result, Pixel_color32* top, Pixel_color24* bottom);
+Return_code load_picture32_default (Picture32* dst, int* column, int max_column);
+
+Return_code merge_pixel (Pixel_color32* result, Pixel_color32* top, Pixel_color24* bottom);
+Return_code merge_pictures_pixels (Picture32* dst,Picture32* top, Picture24* bottom, int* column, int max_column);
+
 
 Buffer_saver3* save_buffers    (Picture32* top, Picture24* bottom, Picture32* result);
 Return_code    restore_buffers (Picture32* top, Picture24* bottom, Picture32* result, Buffer_saver3* saver);

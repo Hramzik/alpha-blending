@@ -44,12 +44,15 @@ Return_code mixer_load_top (Image_Mixer* mixer, const char* file_name) {
     if (!file_name) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    void**          buffer_ptr = (void**) &mixer->media.top_pic.buffer;
-    size_t*         width      =          &mixer->media.top_pic.width;
-    size_t*         height     =          &mixer->media.top_pic.height;
+    void** buffer_ptr = (void**) &mixer->media.top_pic.buffer;
+    int*   width      =          &mixer->media.top_pic.width;
+    int*   height     =          &mixer->media.top_pic.height;
 
 
-    return mixer_load_pic (buffer_ptr, width, height, file_name);
+    mixer_load_pic (buffer_ptr, width, height, file_name);
+
+
+    return SUCCESS;
 }
 
 
@@ -59,9 +62,9 @@ Return_code mixer_load_bottom (Image_Mixer* mixer, const char* file_name) {
     if (!file_name) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    void**          buffer_ptr = (void**) &mixer->media.bottom_pic.buffer;
-    size_t*         width      =          &mixer->media.bottom_pic.width;
-    size_t*         height     =          &mixer->media.bottom_pic.height;
+    void**  buffer_ptr = (void**) &mixer->media.bottom_pic.buffer;
+    int*    width      =          &mixer->media.bottom_pic.width;
+    int*    height     =          &mixer->media.bottom_pic.height;
 
 
     return mixer_load_pic (buffer_ptr, width, height, file_name);
@@ -75,20 +78,20 @@ Return_code mixer_update_window_size_and_result (Image_Mixer* mixer) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    size_t pic_width   = my_max (mixer->media.bottom_pic.width,  mixer->data.top_pic_offset.x + mixer->media.top_pic.width);
-    size_t pic_height  = my_max (mixer->media.bottom_pic.height, mixer->data.top_pic_offset.y + mixer->media.top_pic.height);
+    int pic_width   = mixer_calculate_result_width  (mixer);
+    int pic_height  = mixer_calculate_result_height (mixer);
 
-    size_t result_width   = mixer->media.result_pic.width;
-    size_t result_height  = mixer->media.result_pic.height;
+    int result_width   = mixer->media.result_pic.width;
+    int result_height  = mixer->media.result_pic.height;
 
-    size_t window_width  = mixer->data.window_width;
-    size_t window_height = mixer->data.window_height;
+    int window_width  = mixer->data.window_width;
+    int window_height = mixer->data.window_height;
 
     //--------------------------------------------------
 
     if (result_width != pic_width || result_height != pic_height) {
 
-        mixer->media.result_pic.width  = pic_width;
+        mixer->media.result_pic.width  = pic_width; printf ("debug: passed point %d %d\n", pic_width, pic_height);
         mixer->media.result_pic.height = pic_height;
 
         mixer_generate_result (mixer);
@@ -105,6 +108,32 @@ Return_code mixer_update_window_size_and_result (Image_Mixer* mixer) {
 
 
     return SUCCESS;
+}
+
+
+int mixer_calculate_result_width (Image_Mixer* mixer) {
+
+    if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    int left_border  = my_min (0,                                                          mixer->data.top_pic_offset.x);
+    int right_border = my_max (mixer->media.bottom_pic.width, mixer->media.top_pic.width + mixer->data.top_pic_offset.x);
+
+
+    return right_border - left_border;
+}
+
+
+int mixer_calculate_result_height (Image_Mixer* mixer) {
+
+    if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    int lower_border = my_min (0,                                                            mixer->data.top_pic_offset.y);
+    int upper_border = my_max (mixer->media.bottom_pic.height, mixer->media.top_pic.height + mixer->data.top_pic_offset.y);
+
+
+    return upper_border - lower_border;
 }
 
 
@@ -162,7 +191,7 @@ Return_code mixer_generate_output (Image_Mixer* mixer) {
 #define BUFFER (*buffer_ptr)
 //--------------------------------------------------
 
-Return_code mixer_load_pic (void** buffer_ptr, size_t* width, size_t* height, const char* file_name) {
+Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, const char* file_name) {
 
     if (!buffer_ptr) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
     if (!file_name)  { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -267,7 +296,7 @@ Return_code mixer_check_header_size (FILE* file) {
 }
 
 
-Return_code mixer_load_picture_sizes (FILE* file, size_t* width, size_t* height) {
+Return_code mixer_load_picture_sizes (FILE* file, int* width, int* height) {
 
     if (!file)   { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
     if (!width)  { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -352,9 +381,9 @@ Return_code mixer_render_picture (Image_Mixer* mixer) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    for (size_t x = 0; x < mixer->data.window_width; x++) {
+    for (int x = 0; x < mixer->data.window_width; x++) {
 
-        for (size_t y = 0; y < mixer->data.window_height; y++) {
+        for (int y = 0; y < mixer->data.window_height; y++) {
 
             mixer_render_pixel (mixer, x, y);
         }

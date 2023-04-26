@@ -35,8 +35,8 @@ typedef struct Picture24 {
 
     Pixel_color24* buffer;
 
-    size_t width;
-    size_t height;
+    int width;
+    int height;
 
 } Picture24; const size_t PICTURE24_SIZE = sizeof (Picture24);
 
@@ -45,8 +45,8 @@ typedef struct Picture32 {
 
     Pixel_color32* buffer;
 
-    size_t width;
-    size_t height;
+    int width;
+    int height;
 
 } Picture_32; const size_t PICTURE32_SIZE = sizeof (Picture32);
 

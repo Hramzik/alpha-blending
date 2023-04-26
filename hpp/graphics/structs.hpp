@@ -37,8 +37,8 @@ typedef struct Mixer_data {
 
     Point top_pic_offset;
 
-    size_t window_width;
-    size_t window_height;
+    int window_width;
+    int window_height;
 
 } Mixer_data; const size_t MIXER_DATA_SIZE = sizeof (Mixer_data);
 

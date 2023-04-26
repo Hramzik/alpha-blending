@@ -80,10 +80,10 @@ Return_code initialize_sdl (void);
 Return_code quit_sdl       (void);
 
 Image_Mixer* mixer_ctor            (void);
-Return_code mixer_output_ctor     (Mixer_output* output);
-Return_code mixer_media_ctor      (Mixer_media* media);
-Return_code mixer_conditions_ctor (Mixer_conditions* conditions);
-Return_code mixer_data_ctor       (Mixer_data* data);
+Return_code  mixer_output_ctor     (Mixer_output* output);
+Return_code  mixer_media_ctor      (Mixer_media* media);
+Return_code  mixer_conditions_ctor (Mixer_conditions* conditions);
+Return_code  mixer_data_ctor       (Mixer_data* data);
 
 Return_code mixer_dtor        (Image_Mixer* mixer);
 Return_code mixer_output_dtor (Mixer_output* graphics);
@@ -95,17 +95,19 @@ Return_code mixer_load_media  (Image_Mixer* mixer, const char* top_pic_name    =
                                                   const char* bottom_pic_name = BOTTOM_PICTURE_PATH);
 Return_code mixer_load_top    (Image_Mixer* mixer, const char* file_name);
 Return_code mixer_load_bottom (Image_Mixer* mixer, const char* file_name);
-Return_code mixer_load_pic    (void** buffer_ptr, size_t* width, size_t* height, const char* file_name);
+Return_code mixer_load_pic    (void** buffer_ptr, int* width, int* height, const char* file_name);
 
 Return_code mixer_update_window_size_and_result (Image_Mixer* mixer);
 Return_code mixer_generate_result               (Image_Mixer* mixer);
+int         mixer_calculate_result_width        (Image_Mixer* mixer);
+int         mixer_calculate_result_height       (Image_Mixer* mixer);
 Return_code mixer_generate_output               (Image_Mixer* mixer);
 
 size_t      mixer_get_file_size      (FILE* file);
 size_t      mixer_get_data_offset    (FILE* file);
 Return_code mixer_check_signature    (FILE* file);
 Return_code mixer_check_header_size  (FILE* file);
-Return_code mixer_load_picture_sizes (FILE* file, size_t* width, size_t* height);
+Return_code mixer_load_picture_sizes (FILE* file, int* width, int* height);
 
 //--------------------------------------------------
 
