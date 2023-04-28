@@ -9,7 +9,7 @@ define flags
 endef
 
 define flags_sdl
-	-LC:\Users\hramz_3vliuy6\Desktop\lib\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+	-LC:\Users\hramz_3vliuy6\Desktop\lib\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 endef
 
 define flags_cut_bc_of_sdl
@@ -40,5 +40,5 @@ mixer:
 	$(cppfolder)/main.cpp, \
 	$(cppfolder)/common.cpp, \
 	$(cppfolder)/graphics/graphics.cpp, \
-	$(cppfolder)/alpha.cpp, $(default_path))
+	$(cppfolder)/alpha/alpha.cpp, $(default_path))
 

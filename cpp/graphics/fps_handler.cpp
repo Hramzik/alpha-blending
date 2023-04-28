@@ -1,15 +1,23 @@
 
 
 //--------------------------------------------------
+
+
 #include "../../hpp/graphics/graphics.hpp"
 
-#include "../../lib/logs.cpp"
+
 //--------------------------------------------------
 
 
-Fps_handler* fps_handler_ctor (void) {
+#include "../../lib/logs.cpp"
 
-    Fps_handler* result = (Fps_handler*) calloc (1, FPS_HANDLER_SIZE);
+
+//--------------------------------------------------
+
+
+Fps_Handler* fps_handler_ctor (void) {
+
+    Fps_Handler* result = (Fps_Handler*) calloc (1, FPS_HANDLER_SIZE);
 
 
     result->cur_frame_time = clock ();
@@ -27,7 +35,7 @@ Fps_handler* fps_handler_ctor (void) {
 }
 
 
-Return_code fps_handler_dtor (Fps_handler* handler) {
+Return_code fps_handler_dtor (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -39,7 +47,7 @@ Return_code fps_handler_dtor (Fps_handler* handler) {
 }
 
 
-Return_code fps_handler_next_frame (Fps_handler* handler) {
+Return_code fps_handler_next_frame (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -59,7 +67,7 @@ Return_code fps_handler_next_frame (Fps_handler* handler) {
 }
 
 
-double fps_handler_get_delay_ms (Fps_handler* handler) {
+double fps_handler_get_delay_ms (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -68,7 +76,7 @@ double fps_handler_get_delay_ms (Fps_handler* handler) {
 }
 
 
-double fps_handler_get_fps (Fps_handler* handler) {
+double fps_handler_get_fps (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -77,7 +85,7 @@ double fps_handler_get_fps (Fps_handler* handler) {
 }
 
 
-double fps_handler_get_avg_delay (Fps_handler* handler) {
+double fps_handler_get_avg_delay (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -86,7 +94,7 @@ double fps_handler_get_avg_delay (Fps_handler* handler) {
 }
 
 
-double fps_handler_get_avg_fps (Fps_handler* handler) {
+double fps_handler_get_avg_fps (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -95,7 +103,7 @@ double fps_handler_get_avg_fps (Fps_handler* handler) {
 }
 
 
-Return_code fps_handler_print (Fps_handler* handler) {
+Return_code fps_handler_print (Fps_Handler* handler) {
 
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 

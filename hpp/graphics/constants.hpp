@@ -41,5 +41,17 @@ const size_t HEIGHT_OFFSET  = 0x16;
 const size_t HEIGHT_LEN     = 4;
 
 
+const int HORIZONTAL_MOVE_SMALL_STEP = 1; // in pixels, arrows
+const int VERTICAL_MOVE_SMALL_STEP   = 1;
+const int HORIZONTAL_MOVE_BIG_STEP = 15;   // in pixels, wasd
+const int VERTICAL_MOVE_BIG_STEP   = 15;
+
+#define DEFAULT_SAVING_PATH "work/result.png"
+
+
+const size_t DEFAULT_WINDOW_WIDTH  = 800;
+const size_t DEFAULT_WINDOW_HEIGHT = 800;
+
+
 //--------------------------------------------------
 #endif

@@ -43,7 +43,7 @@ Return_code mixer_dtor (Image_Mixer* mixer) {
 
 Return_code initialize_sdl (void) {
 
-    if(SDL_Init(SDL_INIT_VIDEO) < 0){
+    if(SDL_Init (SDL_INIT_VIDEO) < 0){
 
         LOG_MESSAGE ("SDL could not initialize!\n");
         return LIB_ERR;
@@ -57,6 +57,15 @@ Return_code initialize_sdl (void) {
     }
 
 
+    int imgFlags = IMG_INIT_PNG;
+
+    if(!(IMG_Init (imgFlags) & imgFlags)) {
+
+        LOG_MESSAGE ("SDL_image could not initialize!\n");
+        return LIB_ERR;
+    }
+
+
     return SUCCESS;
 }
 
@@ -65,26 +74,45 @@ Return_code quit_sdl (void) {
 
 
     SDL_Quit ();
+    IMG_Quit ();
 
 
     return SUCCESS;
 }
 
 
-Return_code mixer_output_ctor (Mixer_output* output) {
+Return_code mixer_output_ctor (Mixer_Output* output) {
 
     if (!output) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    output->window   = nullptr;
-    output->renderer = nullptr;
+    output->window = SDL_CreateWindow ("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, MIXER_OUTPUT_FLAGS); // empty header
+
+    if(!output->window) {
+
+        LOG_MESSAGE ("Window could not be created!\n");
+        return LIB_ERR;
+    }
+
+
+    //--------------------------------------------------
+
+
+    output->renderer = SDL_CreateRenderer(output->window, -1, SDL_RENDERER_ACCELERATED);
+
+    if (!output->renderer) {
+
+        LOG_MESSAGE ("Renderer could not be created!");
+        return LIB_ERR;
+    }
 
 
     return SUCCESS;
 }
 
 
-Return_code mixer_output_dtor (Mixer_output* output) {
+Return_code mixer_output_dtor (Mixer_Output* output) {
 
     if (!output) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -97,19 +125,29 @@ Return_code mixer_output_dtor (Mixer_output* output) {
 }
 
 
-Return_code mixer_conditions_ctor (Mixer_conditions* conditions) {
+Return_code mixer_conditions_ctor (Mixer_Conditions* conditions) {
 
     if (!conditions) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
     conditions->exit = false;
 
+    conditions->pressed_w = false;
+    conditions->pressed_a = false;
+    conditions->pressed_s = false;
+    conditions->pressed_d = false;
+
+    conditions->pressed_left  = false;
+    conditions->pressed_right = false;
+    conditions->pressed_up    = false;
+    conditions->pressed_down  = false;
+
 
     return SUCCESS;
 }
 
 
-Return_code mixer_media_ctor (Mixer_media* media) {
+Return_code mixer_media_ctor (Mixer_Media* media) {
 
     if (!media) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -131,7 +169,7 @@ Return_code mixer_media_ctor (Mixer_media* media) {
 }
 
 
-Return_code mixer_media_dtor (Mixer_media* media) {
+Return_code mixer_media_dtor (Mixer_Media* media) {
 
     if (!media) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -145,7 +183,7 @@ Return_code mixer_media_dtor (Mixer_media* media) {
 }
 
 
-Return_code mixer_data_ctor (Mixer_data* data) {
+Return_code mixer_data_ctor (Mixer_Data* data) {
 
     if (!data) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -154,6 +192,11 @@ Return_code mixer_data_ctor (Mixer_data* data) {
 
     data->window_width  = 0;
     data->window_height = 0;
+
+    data->horizontal_speed = 0;
+    data->vertical_speed   = 0;
+
+    data->currently_mirroring = PIC_ID_TOP;
 
 
     return SUCCESS;

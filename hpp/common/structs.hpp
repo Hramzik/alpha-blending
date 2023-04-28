@@ -12,28 +12,28 @@ typedef struct Point {
 
 
 
-typedef struct Pixel_color24 {
+typedef struct Pixel_Color24 {
 
     unsigned char red;
     unsigned char green;
     unsigned char blue;
 
-} Pixel_color24; const size_t PIXEL_COLOR24_SIZE = sizeof (Pixel_color24);
+} Pixel_Color24; const size_t PIXEL_COLOR24_SIZE = sizeof (Pixel_Color24);
 
 
-typedef struct Pixel_color32 {
+typedef struct Pixel_Color32 {
 
     unsigned char red;
     unsigned char green;
     unsigned char blue;
     unsigned char transparency;
 
-} Pixel_color32; const size_t PIXEL_COLOR32_SIZE = sizeof (Pixel_color32);
+} Pixel_Color32; const size_t PIXEL_COLOR32_SIZE = sizeof (Pixel_Color32);
 
 
 typedef struct Picture24 {
 
-    Pixel_color24* buffer;
+    Pixel_Color24* buffer;
 
     int width;
     int height;
@@ -43,7 +43,7 @@ typedef struct Picture24 {
 
 typedef struct Picture32 {
 
-    Pixel_color32* buffer;
+    Pixel_Color32* buffer;
 
     int width;
     int height;

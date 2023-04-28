@@ -17,6 +17,7 @@
 
 #include "c-dtors.cpp"
 #include "fps_handler.cpp"
+#include "conditions.cpp"
 
 
 //--------------------------------------------------
@@ -81,8 +82,8 @@ Return_code mixer_update_window_size_and_result (Image_Mixer* mixer) {
     int pic_width   = mixer_calculate_result_width  (mixer);
     int pic_height  = mixer_calculate_result_height (mixer);
 
-    int result_width   = mixer->media.result_pic.width;
-    int result_height  = mixer->media.result_pic.height;
+    int result_width   = RESULT_PIC.width;
+    int result_height  = RESULT_PIC.height;
 
     int window_width  = mixer->data.window_width;
     int window_height = mixer->data.window_height;
@@ -91,7 +92,7 @@ Return_code mixer_update_window_size_and_result (Image_Mixer* mixer) {
 
     if (result_width != pic_width || result_height != pic_height) {
 
-        mixer->media.result_pic.width  = pic_width; printf ("debug: passed point %d %d\n", pic_width, pic_height);
+        mixer->media.result_pic.width  = pic_width;
         mixer->media.result_pic.height = pic_height;
 
         mixer_generate_result (mixer);
@@ -103,7 +104,7 @@ Return_code mixer_update_window_size_and_result (Image_Mixer* mixer) {
         mixer->data.window_width  = pic_width;
         mixer->data.window_height = pic_height;
 
-        mixer_generate_output (mixer);
+        mixer_resize_output (mixer);
     }
 
 
@@ -142,16 +143,28 @@ Return_code mixer_generate_result (Image_Mixer* mixer) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    size_t new_buffer_len = mixer->media.result_pic.width * mixer->media.result_pic.height;
+    size_t new_buffer_len = RESULT_PIC.width * RESULT_PIC.height;
 
 
-    mixer->media.result_pic.buffer = (Pixel_color32*) realloc (mixer->media.result_pic.buffer, new_buffer_len * PIXEL_COLOR32_SIZE);
+    RESULT_PIC.buffer = (Pixel_Color32*) realloc (RESULT_PIC.buffer, new_buffer_len * PIXEL_COLOR32_SIZE);
 
 
     return SUCCESS;
 }
 
 
+Return_code mixer_resize_output (Image_Mixer* mixer) {
+
+    if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    SDL_SetWindowSize (mixer->output.window, mixer->data.window_width, mixer->data.window_height);
+
+
+    return SUCCESS;
+}
+
+/*
 Return_code mixer_generate_output (Image_Mixer* mixer) {
 
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -185,7 +198,7 @@ Return_code mixer_generate_output (Image_Mixer* mixer) {
 
     return SUCCESS;
 }
-
+*/
 
 //--------------------------------------------------
 #define BUFFER (*buffer_ptr)
@@ -329,7 +342,7 @@ Return_code mixer_work (Image_Mixer* mixer) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    Fps_handler* fps_counter = fps_handler_ctor ();
+    Fps_Handler* fps_counter = fps_handler_ctor ();
 
 
     while(true) {
@@ -338,6 +351,8 @@ Return_code mixer_work (Image_Mixer* mixer) {
         mixer_update_conditions (mixer);
 
         if (mixer->conditions.exit) break;
+
+        mixer_handle_conditions (mixer);
     //--------------------------------------------------
 
 
@@ -369,6 +384,7 @@ Return_code mixer_generate_picture (Image_Mixer* mixer) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
+    mixer_update_window_size_and_result (mixer);
     merge_pictures (&mixer->media.result_pic, &mixer->media.top_pic, &mixer->media.bottom_pic, mixer->data.top_pic_offset);
 
 
@@ -405,7 +421,7 @@ Return_code mixer_render_pixel (Image_Mixer* mixer, size_t x, size_t y) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    Pixel_color32 color = mixer_get_pixel_color (mixer, x, y);
+    Pixel_Color32 color = mixer_get_pixel_color (mixer, x, y);
 
 
     SDL_SetRenderDrawColor (MY_RENDERER, color.red, color.green, color.blue, color.transparency);
@@ -416,42 +432,16 @@ Return_code mixer_render_pixel (Image_Mixer* mixer, size_t x, size_t y) {
 }
 
 
-Pixel_color32 mixer_get_pixel_color (Image_Mixer* mixer, size_t x, size_t y) {
+Pixel_Color32 mixer_get_pixel_color (Image_Mixer* mixer, size_t x, size_t y) {
 
     if (!mixer) { LOG_ERROR (BAD_ARGS); return { 0, 0, 0, 255 }; }
 
 
-    size_t index = y * mixer->media.result_pic.width + x;
+    size_t index = y * RESULT_PIC.width + x;
 
 
-    return mixer->media.result_pic.buffer [index];
+    return RESULT_PIC.buffer [index];
 }
 
 
-Return_code mixer_update_conditions (Image_Mixer* mixer) {
-
-    if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
-
-
-    SDL_Event event = {};
-
-
-    while (SDL_PollEvent (&event)) {
-
-        if (event.type == SDL_QUIT) {
-
-            mixer->conditions.exit = true;
-            break;
-        }
-
-
-        // if (event.type == SDL_KEYDOWN) mixer_update_conditions_keydown (mixer, event);
-
-
-        // if (event.type == SDL_KEYUP)   mixer_update_conditions_keyup   (mixer, event);
-    }
-
-
-    return SUCCESS;
-}
 

@@ -9,6 +9,12 @@
 //--------------------------------------------------
 
 
+#include "../../lib/logs.hpp"
+
+
+//--------------------------------------------------
+
+
 #include "structs.hpp"
 
 
@@ -37,17 +43,17 @@ Return_code load_line_default (Picture32* result);
 Return_code merge_line (Picture32* result, Picture32* top, Picture24* bottom, Point offset);
 
 
-Return_code load_pixel32_from_pixel24 (Pixel_color32* dst, Pixel_color24* src);
-Return_code write_picture24_to_picture32 (Picture32* dst, Picture24* src, int* column, int max_column);
+Return_code load_pixel32_from_pixel24 (Pixel_Color32* dst, Pixel_Color24* src);
+Return_code load_buffer32_from_buffer24 (Picture32* dst, Picture24* src, int* column, int max_column);
 
-Return_code load_pixel32_from_pixel32 (Pixel_color32* dst, Pixel_color32* src);
-Return_code write_picture32_to_picture32 (Picture32* dst, Picture32* src, int* column, int max_column);
+Return_code load_pixel32_from_pixel32 (Pixel_Color32* dst, Pixel_Color32* src);
+Return_code load_buffer32_from_buffer32 (Picture32* dst, Picture32* src, int* column, int max_column);
 
-Return_code load_pixel32_default      (Pixel_color32* dst);
-Return_code load_picture32_default (Picture32* dst, int* column, int max_column);
+Return_code load_pixel32_default      (Pixel_Color32* dst);
+Return_code load_buffer32_default (Picture32* dst, int* column, int max_column);
 
-Return_code merge_pixel (Pixel_color32* result, Pixel_color32* top, Pixel_color24* bottom);
-Return_code merge_pictures_pixels (Picture32* dst,Picture32* top, Picture24* bottom, int* column, int max_column);
+Return_code merge_pixel (Pixel_Color32* result, Pixel_Color32* top, Pixel_Color24* bottom);
+Return_code merge_buffer32 (Picture32* dst, Picture32* top, Picture24* bottom, int* column, int max_column);
 
 
 Buffer_saver3* save_buffers    (Picture32* top, Picture24* bottom, Picture32* result);
