@@ -108,7 +108,7 @@ Return_code fps_handler_print (Fps_Handler* handler) {
     if (!handler) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    if (handler->frame_number == 1 || handler->frame_number == 10 || handler->frame_number == 1000) {
+    if (handler->frame_number == 1 || handler->frame_number == 10 || handler->frame_number == 100) {
 
         printf ("cur fps = %10lf, cur delay = %lf\n",
             fps_handler_get_fps      (handler),

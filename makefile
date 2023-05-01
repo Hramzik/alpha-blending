@@ -17,7 +17,7 @@ define flags_cut_bc_of_sdl
 endef
 
 define compile_sdl_opt
-	$(sc) $(cc) $1 $2 $3 $4 $5 $6 -o $7 $(flags_sdl) $(flags_cut_bc_of_sdl) -O3 -mavx2
+	$(sc) $(cc) $1 $2 $3 $4 -o $5 $(flags_sdl) $(flags_cut_bc_of_sdl) -O3 -mavx2
 endef
 
 define compile_sdl
@@ -29,14 +29,21 @@ default_name = prog
 default_path = $(exefolder)/$(default_name)
 
 
-all: mixer
+all: opt
 
 
 test:
-	$(call compile_sdl,     $(cppfolder)/main.cpp, $(cppfolder)/graphics.cpp, $(default_path))
+	$(call compile_sdl, $(cppfolder)/main.cpp, $(cppfolder)/graphics.cpp, $(default_path))
 
 mixer:
 	$(call compile_sdl, \
+	$(cppfolder)/main.cpp, \
+	$(cppfolder)/common.cpp, \
+	$(cppfolder)/graphics/graphics.cpp, \
+	$(cppfolder)/alpha/alpha.cpp, $(default_path))
+
+opt:
+	$(call compile_sdl_opt, \
 	$(cppfolder)/main.cpp, \
 	$(cppfolder)/common.cpp, \
 	$(cppfolder)/graphics/graphics.cpp, \

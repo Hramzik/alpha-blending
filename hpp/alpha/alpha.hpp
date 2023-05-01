@@ -12,6 +12,18 @@
 #include "../../lib/logs.hpp"
 
 
+//----------------- settings -----------------------
+
+
+#define OPTIMIZE_ALPHA_BLENDING
+
+
+//--------------------------------------------------
+
+#ifdef OPTIMIZE_ALPHA_BLENDING
+    #include <immintrin.h>
+#endif
+
 //--------------------------------------------------
 
 
@@ -58,6 +70,21 @@ Return_code merge_buffer32 (Picture32* dst, Picture32* top, Picture24* bottom, i
 
 Buffer_saver3* save_buffers    (Picture32* top, Picture24* bottom, Picture32* result);
 Return_code    restore_buffers (Picture32* top, Picture24* bottom, Picture32* result, Buffer_saver3* saver);
+
+
+#ifdef OPTIMIZE_ALPHA_BLENDING
+
+    Return_code load_buffer32_from_buffer24_opt (Picture32* dst, Picture24* src, int* column, int max_column);
+    Return_code load_buffer32_from_buffer32_opt (Picture32* dst, Picture32* src, int* column, int max_column);
+    Return_code load_buffer32_default_opt       (Picture32* dst, int* column, int max_column);
+    Return_code merge_buffer32_opt              (Picture32* dst, Picture32* top, Picture24* bottom, int* column, int max_column);
+
+    Return_code load_8_pixels32_from_pixels24 (Pixel_Color32* dst, Pixel_Color24* src);
+    Return_code load_8_pixels32_from_pixels32 (Pixel_Color32* dst, Pixel_Color32* src);
+    Return_code load_8_pixels32_default       (Pixel_Color32* dst);
+    Return_code merge_8_pixels                (Pixel_Color32* result, Pixel_Color32* top, Pixel_Color24* bottom);
+
+#endif
 
 
 //--------------------------------------------------

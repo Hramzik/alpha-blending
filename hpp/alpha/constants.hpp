@@ -3,19 +3,19 @@
 //----------------- settings -----------------------
 
 
-const unsigned char BACKGROUND_TRANSPARENCY = 255;
+const unsigned char BACKGROUND_TRANSPARENCY = 255; // прозрачность пикселей фона
 
-const unsigned char DEFAULT_RED          = 255;
+const unsigned char DEFAULT_RED          = 255; // цвет за картинкой
 const unsigned char DEFAULT_GREEN        = 255;
 const unsigned char DEFAULT_BLUE         = 255;
 const unsigned char DEFAULT_TRANSPARENCY = 255;
 
-const unsigned char TOP_BACKGROUND_RED          = DEFAULT_RED;
+const unsigned char TOP_BACKGROUND_RED          = DEFAULT_RED; // при замене верхних прорачных пикселей вне картинки
 const unsigned char TOP_BACKGROUND_GREEN        = DEFAULT_GREEN;
 const unsigned char TOP_BACKGROUND_BLUE         = DEFAULT_BLUE;
 const unsigned char TOP_BACKGROUND_TRANSPARENCY = DEFAULT_TRANSPARENCY;
 
-const unsigned char MERGED_TRANSPARENCY = 255;
+const unsigned char MERGED_TRANSPARENCY = 255; // прозрачность слитых пикселей
 
 //--------------------------------------------------
 

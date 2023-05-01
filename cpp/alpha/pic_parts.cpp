@@ -9,13 +9,6 @@
 //--------------------------------------------------
 
 
-#include "../../lib/logs.hpp"
-
-
-//--------------------------------------------------
-
-
-
 Return_code copy_top_upper (Picture32* result, int* line, Picture32* top, Point offset) {
 
     if (!result) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }

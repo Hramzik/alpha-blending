@@ -48,14 +48,14 @@ Return_code load_pixel32_from_pixel32 (Pixel_Color32* dst, Pixel_Color32* src) {
     dst->transparency = src->transparency;
 
 
-    if (dst->transparency == 0) { // фон верхней картинки
+    /*if (dst->transparency == 0) { // фон верхней картинки
 
         dst->red   = TOP_BACKGROUND_RED;
         dst->green = TOP_BACKGROUND_GREEN;
         dst->blue  = TOP_BACKGROUND_BLUE;
 
         dst->transparency = TOP_BACKGROUND_TRANSPARENCY;
-    }
+    }*/
 
 
     return SUCCESS;
@@ -96,3 +96,4 @@ Return_code merge_pixel (Pixel_Color32* result, Pixel_Color32* top, Pixel_Color2
 
     return SUCCESS;
 }
+

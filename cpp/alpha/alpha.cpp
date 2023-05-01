@@ -9,9 +9,33 @@
 //--------------------------------------------------
 
 
-#include "pixels.cpp"
+#include "pic_parts.cpp"
+
+//---------------------------
+
+#ifdef OPTIMIZE_ALPHA_BLENDING // подстановка оптимизированных версий
+    #define load_buffer32_from_buffer24 load_buffer32_from_buffer24_opt
+    #define load_buffer32_from_buffer32 load_buffer32_from_buffer32_opt
+    #define load_buffer32_default       load_buffer32_default_opt
+    #define merge_buffer32              merge_buffer32_opt
+#endif
+
 #include "lines.cpp"
-#include "line_phases.cpp"
+
+#undef load_buffer32_from_buffer24
+#undef load_buffer32_from_buffer32
+#undef load_buffer32_default
+#undef merge_buffer32
+
+//---------------------------
+
+#include "line_parts.cpp"
+#include "pixels.cpp"
+
+#ifdef OPTIMIZE_ALPHA_BLENDING
+    #include "line_parts_opt.cpp"
+    #include "pixels_opt.cpp"
+#endif
 
 
 //--------------------------------------------------
