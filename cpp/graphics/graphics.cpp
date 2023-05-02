@@ -50,7 +50,7 @@ Return_code mixer_load_top (Image_Mixer* mixer, const char* file_name) {
     int*   height     =          &mixer->media.top_pic.height;
 
 
-    mixer_load_pic (buffer_ptr, width, height, &mixer->data.bottom_bits_per_pixel, file_name);
+    mixer_load_pic (buffer_ptr, width, height, file_name);
 
 
     return SUCCESS;
@@ -68,40 +68,7 @@ Return_code mixer_load_bottom (Image_Mixer* mixer, const char* file_name) {
     int*    height     =          &mixer->media.bottom_pic.height;
 
 
-    return mixer_load_pic (buffer_ptr, width, height, nullptr, file_name);
-}
-
-
-Return_code mixer_convert_bottom_from_24bit_to_32bit (Image_Mixer* mixer) {
-
-    if (!mixer)     { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
-
-
-    int pixel_count = BOTTOM_PIC.width * BOTTOM_PIC.height;
-
-    Pixel_Color32* new_buffer = (Pixel_Color32*) calloc (pixel_count, PIXEL_COLOR32_SIZE);
-    Pixel_Color24* old_buffer = BOTTOM_PIC.buffer;
-
-
-    for (int i = 0; i < pixel_count; i++) {
-
-        new_buffer [i].red = old_buffer [i].red;
-        new_buffer [i].red = old_buffer [i].green;
-        new_buffer [i].red = old_buffer [i].blue;
-        new_buffer [i].red = 255;
-    }
-
-
-    free (old_buffer);
-
-
-    BOTTOM_PIC.buffer = (Pixel_Color24*) new_buffer;
-
-
-    mixer->data.bottom_bits_per_pixel = 32;
-
-
-    return SUCCESS;
+    return mixer_load_pic (buffer_ptr, width, height, file_name);
 }
 
 
@@ -202,7 +169,7 @@ Return_code mixer_resize_output (Image_Mixer* mixer) {
 #define BUFFER (*buffer_ptr)
 //--------------------------------------------------
 
-Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, int* bits_per_pixel, const char* file_name) {
+Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, const char* file_name) {
 
     if (!buffer_ptr) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
     if (!file_name)  { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -214,8 +181,6 @@ Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, int* bit
     mixer_check_signature     (file);
     mixer_check_header_size   (file);
     mixer_load_picture_sizes  (file, width, height);
-
-    if (bits_per_pixel) mixer_load_bits_per_pixel (file, bits_per_pixel);
 
 
     size_t file_size   = mixer_get_file_size   (file);
@@ -267,21 +232,6 @@ size_t mixer_get_data_offset (FILE* file) {
 
 
     return result;
-}
-
-
-Return_code mixer_load_bits_per_pixel (FILE* file, int* bits_per_pixel) {
-
-    if (!file) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
-    if (!bits_per_pixel) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
-
-
-
-    fseek (file, BITS_PER_PIXEL_OFFSET, SEEK_SET);
-    fread (bits_per_pixel, CHAR_SIZE, BITS_PER_PIXEL_LEN, file); // read bits per pixel
-
-
-    return SUCCESS;
 }
 
 
@@ -361,15 +311,17 @@ Return_code mixer_work (Image_Mixer* mixer) {
     Fps_Handler* fps_counter = fps_handler_ctor ();
 
 
-    mixer->data.currently_mirroring = PIC_ID_BOTTOM;
-    mixer_mirror_vertically (mixer);
-    mixer->data.currently_mirroring = PIC_ID_TOP;
-    mixer_mirror_vertically (mixer);
+    //центрирование кота
 
-    int top_offset_x = mixer->data.window_width  * 1 / 3;
-    int top_offset_y = mixer->data.window_height * 1 / 3;
-
-    mixer->data.top_pic_offset = { .x = top_offset_x, .y = top_offset_y };
+    //mixer->data.currently_mirroring = PIC_ID_BOTTOM;
+    //mixer_mirror_vertically (mixer);
+    //mixer->data.currently_mirroring = PIC_ID_TOP;
+    //mixer_mirror_vertically (mixer);
+//
+    //int top_offset_x = mixer->data.window_width  * 1 / 3;
+    //int top_offset_y = mixer->data.window_height * 1 / 3;
+//
+    //mixer->data.top_pic_offset = { .x = top_offset_x, .y = top_offset_y };
 
 
     while(true) {

@@ -76,7 +76,7 @@ Return_code load_8_pixels32_default (Pixel_Color32* dst) {
 }
 
 
-Return_code merge_8_pixels (Pixel_Color32* result, Pixel_Color32* top, void* bottom, int bottom_bits_per_pixel) {
+Return_code merge_8_pixels (Pixel_Color32* result, Pixel_Color32* top, Pixel_Color24* bottom) {
 
     if (!result) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
     if (!top)    { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -86,7 +86,8 @@ Return_code merge_8_pixels (Pixel_Color32* result, Pixel_Color32* top, void* bot
     // color = (1-a) * bottom + a * top = a * (top - bottom) + bottom
 
     __m256i top_pixels     = _mm256_loadu_si256   ( (__m256i*) top);
-    __m256i bottom_pixels  = get_8bottom_pixels32 (bottom, bottom_bits_per_pixel);
+    __m256i bottom_offsets = _mm256_setr_epi32      ( 0, 3, 6, 9, 12, 15, 18, 21);       // offsets of bottom pixels bytes
+    __m256i bottom_pixels  = _mm256_i32gather_epi32 ( (int*) bottom, bottom_offsets, 1); // on alpha place - trash
 
     __m256i alpha_mask     = _mm256_set1_epi32 (0xFF'00'00'00);
             alpha_mask     = _mm256_and_si256  (top_pixels, alpha_mask);
@@ -130,22 +131,5 @@ Return_code merge_8_pixels (Pixel_Color32* result, Pixel_Color32* top, void* bot
 
 
     return SUCCESS;
-}
-
-
-__m256i get_8bottom_pixels32 (void* bottom, int bits_per_pixel) {
-
-    assert (bottom);
-    assert (bits_per_pixel == 24 || bits_per_pixel == 32);
-
-
-    if (bits_per_pixel == 32) return _mm256_loadu_si256 ( (__m256i*) bottom);
-
-
-    __m256i bottom_offsets = _mm256_setr_epi32      ( 0, 3, 6, 9, 12, 15, 18, 21);       // offsets of bottom pixels bytes
-    __m256i bottom_pixels  = _mm256_i32gather_epi32 ( (int*) bottom, bottom_offsets, 1); // on alpha place - trash
-
-
-    return bottom_pixels;
 }
 

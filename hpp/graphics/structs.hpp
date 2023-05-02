@@ -58,9 +58,6 @@ typedef struct Mixer_Data {
 
     Picture_Id currently_mirroring;
 
-
-    int bottom_bits_per_pixel;
-
 } Mixer_Data; const size_t MIXER_DATA_SIZE = sizeof (Mixer_Data);
 
 

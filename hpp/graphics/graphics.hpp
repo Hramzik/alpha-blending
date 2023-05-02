@@ -24,7 +24,7 @@ const size_t MIXER_WINDOW_WIDTH  = 400;
 const size_t MIXER_WINDOW_HEIGHT = 400;
 const size_t MIXER_PIXEL_COUNT   = MIXER_WINDOW_WIDTH * MIXER_WINDOW_HEIGHT;
 
-const size_t PICTURE_GENERATIONS_COUNT = 1000;
+const size_t PICTURE_GENERATIONS_COUNT = 1;
 
 
 //--------------------------------------------------
@@ -108,8 +108,7 @@ Return_code mixer_load_media  (Image_Mixer* mixer, const char* top_pic_name    =
                                                   const char* bottom_pic_name = BOTTOM_PICTURE_PATH);
 Return_code mixer_load_top    (Image_Mixer* mixer, const char* file_name);
 Return_code mixer_load_bottom (Image_Mixer* mixer, const char* file_name);
-Return_code mixer_convert_bottom_from_24bit_to_32bit (Image_Mixer* mixer);
-Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, int* bits_per_pixel, const char* file_name);
+Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, const char* file_name);
 
 Return_code mixer_update_window_size_and_result (Image_Mixer* mixer);
 Return_code mixer_generate_result               (Image_Mixer* mixer);
