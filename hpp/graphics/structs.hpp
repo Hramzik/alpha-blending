@@ -47,13 +47,19 @@ typedef struct Mixer_Data {
 
     Point top_pic_offset;
 
+
     int window_width;
     int window_height;
+
 
     int horizontal_speed;
     int vertical_speed;
 
+
     Picture_Id currently_mirroring;
+
+
+    int bottom_bits_per_pixel;
 
 } Mixer_Data; const size_t MIXER_DATA_SIZE = sizeof (Mixer_Data);
 

@@ -330,7 +330,7 @@ Return_code swap_columns (void* buffer, Picture_Id pic_id, Point columns, Point 
 
     return SUCCESS;
 }
-Return_code swap_rows    (void* buffer, Picture_Id pic_id, Point rows, Point dimensions) {
+Return_code swap_rows    (void* buffer, Picture_Id pic_id, Point rows,    Point dimensions) {
 
     if (!buffer)                 { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
     if (pic_id == PIC_ID_RESULT) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -400,21 +400,8 @@ Return_code mixer_save_result (Image_Mixer* mixer, const char* path) {
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    void* buffer = RESULT_PIC.buffer;
-
-    int width  = RESULT_PIC.width;
-    int height = RESULT_PIC.height;
-
-    int depth = 32;
-    int pitch = width * 4; // 4 = bytes per color
-
-    Uint32 rmask = 0; // default mask
-    Uint32 gmask = 0;
-    Uint32 bmask = 0;
-    Uint32 amask = 0;
-
-
-    SDL_Surface* temp = SDL_CreateRGBSurfaceFrom (buffer, width, height, depth, pitch, rmask, gmask, bmask, amask);
+    SDL_Surface* temp = mixer_generate_result_surface (mixer);
+    if (!temp) { LOG_ERROR (CRITICAL); return CRITICAL; }
 
 
     IMG_SavePNG (temp, path);
@@ -425,4 +412,6 @@ Return_code mixer_save_result (Image_Mixer* mixer, const char* path) {
 
     return SUCCESS;
 }
+
+
 //--------------------------------------------------

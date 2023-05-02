@@ -74,6 +74,8 @@ Return_code    restore_buffers (Picture32* top, Picture24* bottom, Picture32* re
 
 #ifdef OPTIMIZE_ALPHA_BLENDING
 
+    __m256i get_8bottom_pixels32 (void* bottom, int bits_per_pixel);
+
     Return_code load_buffer32_from_buffer24_opt (Picture32* dst, Picture24* src, int* column, int max_column);
     Return_code load_buffer32_from_buffer32_opt (Picture32* dst, Picture32* src, int* column, int max_column);
     Return_code load_buffer32_default_opt       (Picture32* dst, int* column, int max_column);
@@ -82,7 +84,7 @@ Return_code    restore_buffers (Picture32* top, Picture24* bottom, Picture32* re
     Return_code load_8_pixels32_from_pixels24 (Pixel_Color32* dst, Pixel_Color24* src);
     Return_code load_8_pixels32_from_pixels32 (Pixel_Color32* dst, Pixel_Color32* src);
     Return_code load_8_pixels32_default       (Pixel_Color32* dst);
-    Return_code merge_8_pixels                (Pixel_Color32* result, Pixel_Color32* top, Pixel_Color24* bottom);
+    Return_code merge_8_pixels                (Pixel_Color32* result, Pixel_Color32* top, void* bottom);
 
 #endif
 

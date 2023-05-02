@@ -17,7 +17,7 @@ define flags_cut_bc_of_sdl
 endef
 
 define compile_sdl_opt
-	$(sc) $(cc) $1 $2 $3 $4 -o $5 $(flags_sdl) $(flags_cut_bc_of_sdl) -O3 -mavx2
+	$(sc) $(cc) $1 $2 $3 $4 -o $5 $(flags_sdl) $(flags_cut_bc_of_sdl) -Ofast -mavx2
 endef
 
 define compile_sdl

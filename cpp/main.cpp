@@ -23,10 +23,6 @@ int main (void) {
 
     printf ("goodbye!\n");
 
-    Pixel_Color32 clr = { .red = 255, .green = 200, .blue = 100, .transparency = 50};
-    unsigned char* test = (unsigned char*) &clr;
-    printf ("debug: passed point %d %d %d %d\n", (*test), *(test+1), *(test+2), *(test+3));
-
 
     return 0;
 }

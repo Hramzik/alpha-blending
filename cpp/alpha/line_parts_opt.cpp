@@ -96,7 +96,7 @@ Return_code merge_buffer32_opt (Picture32* dst, Picture32* top, Picture24* botto
 
     for (; *column < max_intrin_column; (*column) += 8) {
 
-        merge_8_pixels (dst->buffer, top->buffer, bottom->buffer);
+        merge_8_pixels (dst->buffer, top->buffer, bottom->buffer, 32);
 
 
         dst->buffer    += 8;

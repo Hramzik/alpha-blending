@@ -50,7 +50,7 @@ Return_code mixer_load_top (Image_Mixer* mixer, const char* file_name) {
     int*   height     =          &mixer->media.top_pic.height;
 
 
-    mixer_load_pic (buffer_ptr, width, height, file_name);
+    mixer_load_pic (buffer_ptr, width, height, &mixer->data.bottom_bits_per_pixel, file_name);
 
 
     return SUCCESS;
@@ -68,7 +68,40 @@ Return_code mixer_load_bottom (Image_Mixer* mixer, const char* file_name) {
     int*    height     =          &mixer->media.bottom_pic.height;
 
 
-    return mixer_load_pic (buffer_ptr, width, height, file_name);
+    return mixer_load_pic (buffer_ptr, width, height, nullptr, file_name);
+}
+
+
+Return_code mixer_convert_bottom_from_24bit_to_32bit (Image_Mixer* mixer) {
+
+    if (!mixer)     { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    int pixel_count = BOTTOM_PIC.width * BOTTOM_PIC.height;
+
+    Pixel_Color32* new_buffer = (Pixel_Color32*) calloc (pixel_count, PIXEL_COLOR32_SIZE);
+    Pixel_Color24* old_buffer = BOTTOM_PIC.buffer;
+
+
+    for (int i = 0; i < pixel_count; i++) {
+
+        new_buffer [i].red = old_buffer [i].red;
+        new_buffer [i].red = old_buffer [i].green;
+        new_buffer [i].red = old_buffer [i].blue;
+        new_buffer [i].red = 255;
+    }
+
+
+    free (old_buffer);
+
+
+    BOTTOM_PIC.buffer = (Pixel_Color24*) new_buffer;
+
+
+    mixer->data.bottom_bits_per_pixel = 32;
+
+
+    return SUCCESS;
 }
 
 
@@ -164,47 +197,12 @@ Return_code mixer_resize_output (Image_Mixer* mixer) {
     return SUCCESS;
 }
 
-/*
-Return_code mixer_generate_output (Image_Mixer* mixer) {
-
-    if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
-
-
-    if (mixer->output.renderer) SDL_DestroyRenderer (mixer->output.renderer);
-    if (mixer->output.window)   SDL_DestroyWindow   (mixer->output.window);
-
-
-    mixer->output.window = SDL_CreateWindow ("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        (int) mixer->data.window_width, (int) mixer->data.window_height, MIXER_OUTPUT_FLAGS); // empty header
-
-    if(!mixer->output.window) {
-
-        LOG_MESSAGE ("Window could not be created!\n");
-        return LIB_ERR;
-    }
-
-
-    //--------------------------------------------------
-
-
-    mixer->output.renderer = SDL_CreateRenderer(mixer->output.window, -1, SDL_RENDERER_ACCELERATED);
-
-    if (!mixer->output.renderer) {
-
-        LOG_MESSAGE ("Renderer could not be created!");
-        return LIB_ERR;
-    }
-
-
-    return SUCCESS;
-}
-*/
 
 //--------------------------------------------------
 #define BUFFER (*buffer_ptr)
 //--------------------------------------------------
 
-Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, const char* file_name) {
+Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, int* bits_per_pixel, const char* file_name) {
 
     if (!buffer_ptr) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
     if (!file_name)  { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
@@ -213,9 +211,12 @@ Return_code mixer_load_pic (void** buffer_ptr, int* width, int* height, const ch
     FILE* file = fopen (file_name, "rb");
 
 
-    mixer_check_signature    (file);
-    mixer_check_header_size  (file);
-    mixer_load_picture_sizes (file, width, height);
+    mixer_check_signature     (file);
+    mixer_check_header_size   (file);
+    mixer_load_picture_sizes  (file, width, height);
+
+    if (bits_per_pixel) mixer_load_bits_per_pixel (file, bits_per_pixel);
+
 
     size_t file_size   = mixer_get_file_size   (file);
     size_t data_offset = mixer_get_data_offset (file);
@@ -266,6 +267,21 @@ size_t mixer_get_data_offset (FILE* file) {
 
 
     return result;
+}
+
+
+Return_code mixer_load_bits_per_pixel (FILE* file, int* bits_per_pixel) {
+
+    if (!file) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+    if (!bits_per_pixel) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+
+    fseek (file, BITS_PER_PIXEL_OFFSET, SEEK_SET);
+    fread (bits_per_pixel, CHAR_SIZE, BITS_PER_PIXEL_LEN, file); // read bits per pixel
+
+
+    return SUCCESS;
 }
 
 
@@ -345,6 +361,17 @@ Return_code mixer_work (Image_Mixer* mixer) {
     Fps_Handler* fps_counter = fps_handler_ctor ();
 
 
+    mixer->data.currently_mirroring = PIC_ID_BOTTOM;
+    mixer_mirror_vertically (mixer);
+    mixer->data.currently_mirroring = PIC_ID_TOP;
+    mixer_mirror_vertically (mixer);
+
+    int top_offset_x = mixer->data.window_width  * 1 / 3;
+    int top_offset_y = mixer->data.window_height * 1 / 3;
+
+    mixer->data.top_pic_offset = { .x = top_offset_x, .y = top_offset_y };
+
+
     while(true) {
 
     //--------------------------------------------------
@@ -356,14 +383,11 @@ Return_code mixer_work (Image_Mixer* mixer) {
     //--------------------------------------------------
 
 
-        for (size_t i = 0; i < PICTURE_GENERATIONS_COUNT; i++) {
-
-            mixer_generate_picture (mixer);
-        }
+        mixer_generate_picture (mixer);
 
 
         SDL_RenderClear (mixer->output.renderer);
-        mixer_render_picture   (mixer);
+        mixer_render_picture (mixer);
         SDL_RenderPresent (mixer->output.renderer);
 
 
@@ -385,14 +409,19 @@ Return_code mixer_generate_picture (Image_Mixer* mixer) {
 
 
     mixer_update_window_size_and_result (mixer);
-    merge_pictures (&mixer->media.result_pic, &mixer->media.top_pic, &mixer->media.bottom_pic, mixer->data.top_pic_offset);
+
+
+    for (size_t i = 0; i < PICTURE_GENERATIONS_COUNT; i++) {
+
+        merge_pictures (&RESULT_PIC, &TOP_PIC, &BOTTOM_PIC, mixer->data.top_pic_offset);
+    }
 
 
     return SUCCESS;
 }
 
 
-Return_code mixer_render_picture (Image_Mixer* mixer) {
+Return_code mixer_render_picture_by_pixels (Image_Mixer* mixer) {
 
     if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
@@ -410,11 +439,23 @@ Return_code mixer_render_picture (Image_Mixer* mixer) {
 }
 
 
-//--------------------------------------------------
+Return_code mixer_render_picture (Image_Mixer* mixer) {
 
-#define MY_RENDERER mixer->output.renderer
+    if (!mixer) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
-//--------------------------------------------------
+
+    SDL_Texture* result_texture = mixer_generate_result_texture (mixer);
+
+
+    SDL_RenderCopy (mixer->output.renderer, result_texture, nullptr, nullptr);
+
+
+    SDL_DestroyTexture (result_texture);
+
+
+    return SUCCESS;
+}
+
 
 Return_code mixer_render_pixel (Image_Mixer* mixer, size_t x, size_t y) {
 
@@ -443,5 +484,62 @@ Pixel_Color32 mixer_get_pixel_color (Image_Mixer* mixer, size_t x, size_t y) {
     return RESULT_PIC.buffer [index];
 }
 
+
+SDL_Surface* mixer_generate_result_surface (Image_Mixer* mixer) {
+
+    if (!mixer) { LOG_ERROR (BAD_ARGS); return nullptr; }
+
+
+    void* buffer = RESULT_PIC.buffer;
+
+    int width  = RESULT_PIC.width;
+    int height = RESULT_PIC.height;
+
+    int depth = 32;
+    int pitch = width * 4; // 4 = bytes per color
+
+    Uint32 rmask = 0; // default mask
+    Uint32 gmask = 0;
+    Uint32 bmask = 0;
+    Uint32 amask = 0;
+
+
+    SDL_Surface* result_surface = SDL_CreateRGBSurfaceFrom (buffer, width, height, depth, pitch, 
+                                                            rmask,  gmask, bmask,  amask);
+
+
+    if (!result_surface) {
+
+        LOG_MESSAGE ("Unable to create surface!");
+        return nullptr;
+    }
+
+
+    return result_surface;
+}
+
+
+SDL_Texture* mixer_generate_result_texture (Image_Mixer* mixer) {
+
+    if (!mixer) { LOG_ERROR (BAD_ARGS); return nullptr; }
+
+
+    SDL_Surface* temp_surface = mixer_generate_result_surface (mixer);
+    if (!temp_surface) { LOG_ERROR (CRITICAL); return nullptr; }
+
+
+    SDL_Texture* result_texture = SDL_CreateTextureFromSurface (mixer->output.renderer, temp_surface);
+    SDL_FreeSurface (temp_surface);
+
+
+    if (!result_texture) {
+
+        LOG_MESSAGE ("Unable to create texture!");
+        return nullptr;
+    }
+
+
+    return result_texture;
+}
 
 

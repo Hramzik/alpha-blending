@@ -34,6 +34,9 @@ const size_t HEADER_SIZE_ETALON1 = 40;  // bmp3
 const size_t HEADER_SIZE_ETALON2 = 108; // bmp4
 const size_t HEADER_SIZE_ETALON3 = 124; // bmp5
 
+const size_t BITS_PER_PIXEL_OFFSET = 0x1C;
+const size_t BITS_PER_PIXEL_LEN    = 2;
+
 const size_t WIDTH_OFFSET  = 0x12;
 const size_t WIDTH_LEN     = 4;
 
@@ -43,8 +46,8 @@ const size_t HEIGHT_LEN     = 4;
 
 const int HORIZONTAL_MOVE_SMALL_STEP = 1; // in pixels, arrows
 const int VERTICAL_MOVE_SMALL_STEP   = 1;
-const int HORIZONTAL_MOVE_BIG_STEP = 15;   // in pixels, wasd
-const int VERTICAL_MOVE_BIG_STEP   = 15;
+const int HORIZONTAL_MOVE_BIG_STEP = 5;   // in pixels, wasd
+const int VERTICAL_MOVE_BIG_STEP   = 5;
 
 #define DEFAULT_SAVING_PATH "work/result.png"
 
